@@ -59,11 +59,43 @@ mutation_rules = {
     "Regex": lambda value, mutation_rate: value,
     "PenaltyBreakAssignment": make_delta_sq(2),
     "AlignEscapedNewlines": make_choice("DontAlign", "Left", "Right"),
+    "AlignConsecutiveAssignments": make_choice("None", "Consecutive", "AcrossEmptyLines", "AcrossComments", "AcrossEmptyLinesAndComments"),
+    "AlignConsecutiveBitFields": make_choice("None", "Consecutive", "AcrossEmptyLines", "AcrossComments", "AcrossEmptyLinesAndComments"),
+    "AlignConsecutiveDeclarations": make_choice("None", "Consecutive", "AcrossEmptyLines", "AcrossComments", "AcrossEmptyLinesAndComments"),
+    "AlignConsecutiveMacros": make_choice("None", "Consecutive", "AcrossEmptyLines", "AcrossComments", "AcrossEmptyLinesAndComments"),
+    "AlignOperands": make_choice("DontAlign", "Align", "AlignAfterOperator"),
+    "AllowShortBlocksOnASingleLine": make_choice("Never", "Empty", "Always"),
+    "AllowShortIfStatementsOnASingleLine": make_choice("Never", "WithoutElse", "OnlyFirstIf", "AllIfsAndElse"),
+    "AllowShortLambdasOnASingleLine": make_choice("None", "Empty", "Inline", "All"),
+    "BitFieldColonSpacing": make_choice("Both", "None", "Before", "After"),
     "BreakConstructorInitializers": make_choice("BeforeColon", "BeforeComma", "AfterColon"),
+    "BreakInheritanceList": make_choice("BeforeColon", "BeforeComma", "AfterColon", "AfterComma"),
+    "EmptyLineBeforeAccessModifier": make_choice("Never", "Leave", "Always"),
+    "IncludeBlocks": make_choice("Preserve", "Merge", "Regroup"),
+    "IndentExternBlock": make_choice("AfterExternBlock", "NoIndent", "Indent"),
+    "IndentPPDirectives": make_choice("None", "AfterHash", "BeforeHash"),
+    "SpaceAroundPointerQualifiers": make_choice("Default", "Before", "After", "Both"),
 }
 
+ignore_rules = {
+    "AttributeMacros",
+    "IncludeIsMainSourceRegex",
+    "InsertTrailingCommas",
+    "ObjCBinPackProtocolList",
+    "PenaltyBreakTemplateDeclaration",
+    "PenaltyIndentedWhitespace",
+    "RawStringFormats",
+    "SortJavaStaticImport",
+    "SortPriority",
+    "StatementAttributeLikeMacros",
+    "StatementMacros",
+    "WhitespaceSensitiveMacros",
+}
 
 def mutate_value(key, value, mutation_rate):
+    if key in ignore_rules:
+        return value
+    
     if key in mutation_rules:
         mutation_rule = mutation_rules[key]
         return mutation_rule(value, mutation_rate)
