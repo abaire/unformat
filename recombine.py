@@ -62,7 +62,6 @@ mutation_rules = {
     "BreakConstructorInitializers": make_choice("BeforeColon", "BeforeComma", "AfterColon"),
 }
 
-
 def mutate_value(key, value, mutation_rate):
     if key in mutation_rules:
         mutation_rule = mutation_rules[key]
@@ -75,12 +74,15 @@ def mutate_value(key, value, mutation_rate):
     return value
 
 
-def visit_line(key, value, mutation_rate):
+def visit_line(key, value, mutation_rate, locked_keys):
+    if key in locked_keys:
+        return value
+
     return mutate_value(key, value, mutation_rate) if random() < mutation_rate else value
 
 
-def mutate(config, mutation_rate):
-    return {key: visit_line(key, value, mutation_rate) for key, value in config.items()}
+def mutate(config, mutation_rate, locked_keys):
+    return {key: visit_line(key, value, mutation_rate, locked_keys) for key, value in config.items()}
 
 
 def recombine(scored_parents, args):
@@ -91,7 +93,8 @@ def recombine(scored_parents, args):
 
     # rank-based selection with elitism
     elite_configs = [fittest_config]
-    recombined_configs = [mutate(ranked[int(random() * random() * len(ranked))][1], args.mutation) for _ in
+    locked_keys = set(args.lock)
+    recombined_configs = [mutate(ranked[int(random() * random() * len(ranked))][1], args.mutation, locked_keys) for _ in
                           range(args.population - 1)]
     recombination = elite_configs + recombined_configs
 
